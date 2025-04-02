@@ -33,9 +33,6 @@ export default function SpellCard({ spell }: { spell: Spell }) {
 
         {/* Spell Details */}
         <Box sx={{ pl: spell.icon ? 7 : 0 }}> {/* Adjust padding if icon exists */}
-          <Typography variant="body2" color="lightgray" sx={{ mb: 0.5 }}>
-            ID: {spell.id}
-          </Typography>
           <Typography variant="body2" color="lightgray">
             {spell.description || 'No description available'}
           </Typography>

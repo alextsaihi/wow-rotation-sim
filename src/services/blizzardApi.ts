@@ -27,7 +27,6 @@ export async function getToken() {
         }
     );
     accessToken = response.data.access_token;
-	console.log('Access token:', accessToken); // Log the access token for debugging
 }
 
 export async function getSpell(spellId: number): Promise<Spell> {

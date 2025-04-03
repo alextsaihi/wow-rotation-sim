@@ -18,19 +18,24 @@ const RecentCasts: React.FC = () => {
       </Typography>
       <Stack direction="row" spacing={1} sx={{ overflowX: 'auto' }}>
         {recentCasts.map((spell, index) => (
-          <Avatar
-            key={index}
-            src={spell.icon}
-            alt={spell.name}
-            sx={{ 
-              width: 40, 
-              height: 40, 
-              border: '1px solid #3a2c1b',
-              bgcolor: '#000000' 
-            }}
-            title={spell.name} // Show name on hover
-          />
-        ))}
+          <Box
+          key={index}
+          component="img"
+          src={spell.icon}
+          alt={spell.name}
+          sx={{
+            width: 40,
+            height: 40,
+            border: '1px solid #3a2c1b',
+            bgcolor: '#000000',
+            borderRadius: 0, // Sharp corners
+            objectFit: 'cover', // Ensures image fills container
+            display: 'block', // Removes any inline spacing
+            cursor: 'help', // Changes cursor on hover
+          }}
+          title={spell.name}
+        />
+      ))}
       </Stack>
     </Box>
   );

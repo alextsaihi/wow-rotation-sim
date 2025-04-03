@@ -68,8 +68,8 @@ export const KeybindProvider: React.FC<{children: React.ReactNode}> = ({ childre
       return newSpellToKey;
     });
 
-    cancelAssigning();
-  }, [spellToKey, cancelAssigning]);
+    return spell;
+  }, [spellToKey]);
 
   return (
     <KeybindContext.Provider 

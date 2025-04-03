@@ -1,13 +1,14 @@
 // src/components/SpellBook.tsx
-
 import React, { useState, useEffect } from 'react';
 import { Box, Paper, Tooltip } from '@mui/material';
 import { useKeybinds } from '../contexts/KeybindContext';
+import { useRecentCasts } from '../contexts/RecentCastsContext';
 import SpellCard from './SpellCard';
 import { Spell } from '../types';
 
 const SpellBook: React.FC<{ spells: Spell[] }> = ({ spells }) => {
   const { isAssigning, assignKeybind, spellToKey } = useKeybinds();
+  const { addRecentCast } = useRecentCasts();
   const [selectedSpell, setSelectedSpell] = useState<Spell | null>(null);
 
   // Handle key assignment
@@ -17,16 +18,17 @@ const SpellBook: React.FC<{ spells: Spell[] }> = ({ spells }) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code.startsWith('Key') || e.code.startsWith('Digit')) {
         assignKeybind(selectedSpell, e.code);
-        setSelectedSpell(null); // Reset after assignment
+        addRecentCast(selectedSpell); // Add to recent casts when assigned
+        setSelectedSpell(null); // Reset selection
       }
       if (e.key === 'Escape') {
-        setSelectedSpell(null);
+        setSelectedSpell(null); // Cancel selection without assigning
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAssigning, selectedSpell, assignKeybind]);
+  }, [isAssigning, selectedSpell, assignKeybind, addRecentCast]);
 
   return (
     <Box sx={{ 
@@ -51,23 +53,35 @@ const SpellBook: React.FC<{ spells: Spell[] }> = ({ spells }) => {
             arrow
           >
             <Paper
-              onClick={() => isAssigning && setSelectedSpell(spell)}
-
+              onClick={() => {
+                if (isAssigning) {
+                  setSelectedSpell(spell);
+                  console.log(`Selected ${spell.name} for key assignment`);
+                }
+              }}
               sx={{
                 width: 56,
                 height: 56,
                 background: spell.icon 
                   ? `url(${spell.icon}) center/contain no-repeat, #1a1a1a`
                   : '#1a1a1a',
-                border: '2px solid #3a2c1b',
+                border: selectedSpell?.id === spell.id 
+                  ? '2px solid #ffd100' 
+                  : '2px solid #3a2c1b',
                 borderRadius: 1,
                 cursor: 'pointer',
                 position: 'relative',
                 '&:hover': {
                   transform: 'scale(1.1)',
-                  boxShadow: '0 0 10px rgba(255, 209, 0, 0.5)'
+                  boxShadow: selectedSpell?.id === spell.id
+                    ? '0 0 15px rgba(255, 209, 0, 0.8)'
+                    : '0 0 10px rgba(255, 209, 0, 0.5)'
                 },
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                opacity: isAssigning && !selectedSpell ? 1 : 1,
+                filter: selectedSpell && selectedSpell.id !== spell.id 
+                  ? 'brightness(0.5)' 
+                  : 'none'
               }}
             >
               {/* Keybind Badge */}
@@ -96,6 +110,17 @@ const SpellBook: React.FC<{ spells: Spell[] }> = ({ spells }) => {
           </Tooltip>
         ))}
       </Box>
+
+      {/* Assignment Status Indicator */}
+      {selectedSpell && (
+        <Box sx={{
+          mt: 2,
+          color: '#ffd100',
+          textAlign: 'center'
+        }}>
+          Press any key to bind {selectedSpell.name} or ESC to cancel
+        </Box>
+      )}
     </Box>
   );
 };
